@@ -78,7 +78,7 @@ public class ConfigParam {
     static boolean bReadThreadGoing;
 
     public ConfigParam(Context context) {
-        this.mContext = context;
+        this.mContext = context.getApplicationContext();
         initParam();
     }
 
@@ -262,8 +262,12 @@ public class ConfigParam {
 
     public void sendCommand(String command) {
         openUsbPort();
+        if (ftDev == null){
+//            SingleToast.showToastShort(mContext, "device is detached");
+            return;
+        }
         if (!ftDev.isOpen()) {
-            SingleToast.showToastShort(mContext, "SendMessage: device not open");
+            SingleToast.showToastShort(mContext, "device is not open");
             return;
         }
 
