@@ -1,4 +1,4 @@
-package cn.bleedyao.ftdevlibrary;
+package cn.bleedyao.ftdevlibrary.core;
 
 import android.os.Handler;
 import android.os.Message;
@@ -8,19 +8,17 @@ import com.ftdi.j2xx.FT_Device;
 
 /**
  * Created by yaoluhao on 15/11/2017.
+ *
  */
 public class ReadThread extends Thread {
     private Handler mHandler;
-    private boolean bReadThreadGoing;
     private FT_Device ftDev;
-    long lastTime;
-    long differTime;
+    private long lastTime;
     private static final int READ_DELAY = 50;
     private static final int CHECKOUT_DELAY = 60;
 
-    ReadThread(Handler h, boolean bReadThreadGoing, FT_Device ftDev) {
+    ReadThread(Handler h,FT_Device ftDev) {
         mHandler = h;
-        this.bReadThreadGoing = bReadThreadGoing;
         this.ftDev = ftDev;
         this.setPriority(Thread.MAX_PRIORITY);
     }
@@ -31,7 +29,7 @@ public class ReadThread extends Thread {
         int iavailable;
         long currentTime;
         String temp = "";
-        while (bReadThreadGoing) {
+        while (ConfigParam.bReadThreadGoing) {
             try {
                 Thread.sleep(READ_DELAY);
             } catch (InterruptedException e) {
@@ -52,13 +50,14 @@ public class ReadThread extends Thread {
                     }
 
                     currentTime = System.currentTimeMillis();
-                    differTime = currentTime - lastTime;
+                    long differTime = currentTime - lastTime;
                     lastTime = currentTime;
 
 //                        Log.d(TAG, "run: " + differTime);
                     Message msg = mHandler.obtainMessage();
                     msg.what = ConfigParam.MESSAGE_RESEVIE;
                     msg.obj = extractData(ConfigParam.readDataToText, iavailable);
+                    // 解决接收两次数据得到一条完整数据的问题
                     if (differTime > CHECKOUT_DELAY) {
                         temp = extractData(ConfigParam.readDataToText, iavailable);
                         mHandler.sendMessageDelayed(msg, CHECKOUT_DELAY);
@@ -80,10 +79,10 @@ public class ReadThread extends Thread {
     }
 
     public boolean isbReadThreadGoing() {
-        return bReadThreadGoing;
+        return ConfigParam.bReadThreadGoing;
     }
 
     public void setbReadThreadGoing(boolean bReadThreadGoing) {
-        this.bReadThreadGoing = bReadThreadGoing;
+        ConfigParam.bReadThreadGoing = bReadThreadGoing;
     }
 }
