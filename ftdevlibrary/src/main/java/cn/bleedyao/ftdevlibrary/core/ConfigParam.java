@@ -6,7 +6,9 @@ import android.util.Log;
 import com.ftdi.j2xx.D2xxManager;
 import com.ftdi.j2xx.FT_Device;
 
-import cn.bleedyao.ftdevlibrary.exchange.FtDev;
+import java.nio.charset.Charset;
+
+import cn.bleedyao.ftdevlibrary.listen.Converter;
 import cn.bleedyao.ftdevlibrary.utils.SingleToast;
 
 /**
@@ -18,55 +20,14 @@ public class ConfigParam {
     static byte[] readData = new byte[readLength];
     static char[] readDataToText = new char[readLength];
     static final int MESSAGE_RESEVIE = 1;
+    String charsetName = "ISO-8859-1";
 
 
-
-
-    private int baudRate; /*baud rate*/
-    private byte stopBit; /*1:1stop bits, 2:2 stop bits*/
-    private byte dataBit; /*8:8bit, 7: 7bit*/
-    private byte parity;  /* 0: none, 1: odd, 2: even, 3: mark, 4: space*/
-    private byte flowControl; /*0:none, 1: flow control(CTS,RTS)*/
-
-    public int getBaudRate() {
-        return baudRate;
-    }
-
-    public void setBaudRate(int baudRate) {
-        this.baudRate = baudRate;
-    }
-
-    public byte getStopBit() {
-        return stopBit;
-    }
-
-    public void setStopBit(byte stopBit) {
-        this.stopBit = stopBit;
-    }
-
-    public byte getDataBit() {
-        return dataBit;
-    }
-
-    public void setDataBit(byte dataBit) {
-        this.dataBit = dataBit;
-    }
-
-    public byte getParity() {
-        return parity;
-    }
-
-    public void setParity(byte parity) {
-        this.parity = parity;
-    }
-
-    public byte getFlowControl() {
-        return flowControl;
-    }
-
-    public void setFlowControl(byte flowControl) {
-        this.flowControl = flowControl;
-    }
+    int baudRate; /*baud rate*/
+    byte stopBit; /*1:1stop bits, 2:2 stop bits*/
+    byte dataBit; /*8:8bit, 7: 7bit*/
+    byte parity;  /* 0: none, 1: odd, 2: even, 3: mark, 4: space*/
+    byte flowControl; /*0:none, 1: flow control(CTS,RTS)*/
 
     private D2xxManager ftD2xx;
     private FT_Device ftDev = null;
@@ -77,9 +38,10 @@ public class ConfigParam {
     private boolean uart_configured = false;
     static boolean bReadThreadGoing;
 
-    public ConfigParam(Context context) {
+    ConfigParam(Context context) {
         this.mContext = context.getApplicationContext();
         initParam();
+        openUsbPort();
     }
 
     /**
@@ -260,10 +222,10 @@ public class ConfigParam {
 
     }
 
-    public void sendCommand(String command) {
+    private void sendCommand(String command, String charsetName) {
         openUsbPort();
-        if (ftDev == null){
-//            SingleToast.showToastShort(mContext, "device is detached");
+        if (ftDev == null) {
+            SingleToast.showToastShort(mContext, "device is detached");
             return;
         }
         if (!ftDev.isOpen()) {
@@ -280,8 +242,35 @@ public class ConfigParam {
 //		ftDev.purge((byte) (D2xxManager.FT_PURGE_TX | D2xxManager.FT_PURGE_RX));
 
 //        String writeData = writeText.getText().toString();
-        byte[] OutData = command.getBytes();
-        SingleToast.showToastShort(mContext, "send: " .concat(command));
-        ftDev.write(OutData, command.length());
+        byte[] outData = command.getBytes(Charset.forName("ISO-8859-1"));
+        SingleToast.showToastShort(mContext, command.length() + " send: ".concat(command));
+//        Log.d("config", "sendCommand: " + Arrays.toString(outData));
+        ftDev.write(outData, command.length());
+    }
+
+    void sendCommand(String message, Converter converter) {
+        if (converter != null) {
+            message = converter.convert(message);
+        }
+        sendCommand(message, charsetName);
+    }
+
+    void disconnectFunction() {
+        devCount = -1;
+        currentIndex = -1;
+        bReadThreadGoing = false;
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        if (ftDev != null) {
+            synchronized (this) {
+                if (ftDev.isOpen()) {
+                    ftDev.close();
+                }
+            }
+        }
     }
 }

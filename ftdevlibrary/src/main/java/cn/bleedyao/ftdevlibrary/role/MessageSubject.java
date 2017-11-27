@@ -1,4 +1,4 @@
-package cn.bleedyao.ftdevlibrary.interfaces.role;
+package cn.bleedyao.ftdevlibrary.role;
 
 
 /**
@@ -6,9 +6,10 @@ package cn.bleedyao.ftdevlibrary.interfaces.role;
  */
 
 public interface MessageSubject {
+
     void addObserver(MessageObserver o);
 
     void removeObserver(MessageObserver o);
 
-    void notifyObservers(String message);
+    void notifyObservers(String message,int available);
 }

@@ -1,23 +1,25 @@
 package cn.bleedyao.ftdevlibrary.core;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 import com.ftdi.j2xx.FT_Device;
 
 
 /**
  * Created by yaoluhao on 15/11/2017.
- *
  */
 public class ReadThread extends Thread {
+    private static final String TAG = "ReadThread";
     private Handler mHandler;
     private FT_Device ftDev;
     private long lastTime;
-    private static final int READ_DELAY = 50;
-    private static final int CHECKOUT_DELAY = 60;
+    private static final int READ_DELAY = 20;
+    private static final int CHECKOUT_DELAY = READ_DELAY + 5;
 
-    ReadThread(Handler h,FT_Device ftDev) {
+    ReadThread(Handler h, FT_Device ftDev) {
         mHandler = h;
         this.ftDev = ftDev;
         this.setPriority(Thread.MAX_PRIORITY);
@@ -29,6 +31,7 @@ public class ReadThread extends Thread {
         int iavailable;
         long currentTime;
         String temp = "";
+        Bundle bundle = new Bundle();
         while (ConfigParam.bReadThreadGoing) {
             try {
                 Thread.sleep(READ_DELAY);
@@ -39,7 +42,7 @@ public class ReadThread extends Thread {
             synchronized (this) {
                 iavailable = ftDev.getQueueStatus();
                 if (iavailable > 0) {
-//                        Log.d(TAG, "iavailable: " + iavailable);
+                    Log.d(TAG, "iavailable: " + iavailable);
                     if (iavailable > ConfigParam.readLength) {
                         iavailable = ConfigParam.readLength;
                     }
@@ -56,7 +59,11 @@ public class ReadThread extends Thread {
 //                        Log.d(TAG, "run: " + differTime);
                     Message msg = mHandler.obtainMessage();
                     msg.what = ConfigParam.MESSAGE_RESEVIE;
-                    msg.obj = extractData(ConfigParam.readDataToText, iavailable);
+                    bundle.putString(FtDev.DATA, extractData(ConfigParam.readDataToText,
+                            iavailable));
+                    bundle.putInt(FtDev.AVAILABLE, iavailable);
+                    msg.setData(bundle);
+//                    msg.obj = extractData(ConfigParam.readDataToText, iavailable);
                     // 解决接收两次数据得到一条完整数据的问题
                     if (differTime > CHECKOUT_DELAY) {
                         temp = extractData(ConfigParam.readDataToText, iavailable);
@@ -65,7 +72,8 @@ public class ReadThread extends Thread {
                         mHandler.removeMessages(ConfigParam.MESSAGE_RESEVIE);
                         temp = temp.concat(extractData(ConfigParam.readDataToText,
                                 iavailable));
-                        msg.obj = temp;
+//                        msg.obj = temp;
+                        bundle.putString("data", temp);
                         mHandler.sendMessage(msg);
                     }
 //                        Log.d(TAG, "run: " + temp);
