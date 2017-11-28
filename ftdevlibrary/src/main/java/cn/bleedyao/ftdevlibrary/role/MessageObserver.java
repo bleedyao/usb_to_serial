@@ -7,6 +7,6 @@ package cn.bleedyao.ftdevlibrary.role;
 public interface MessageObserver {
     boolean filter(String message);
 
-    void receive(String message,int available);
+    void receive(String message, int available);
 
 }
