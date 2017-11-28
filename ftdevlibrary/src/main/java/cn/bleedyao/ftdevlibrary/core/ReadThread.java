@@ -16,7 +16,7 @@ public class ReadThread extends Thread {
     private Handler mHandler;
     private FT_Device ftDev;
     private long lastTime;
-    private static final int READ_DELAY = 22;
+    private static final int READ_DELAY = 50;
     private static final int CHECKOUT_DELAY = READ_DELAY + 10;
 
     ReadThread(Handler h, FT_Device ftDev) {
