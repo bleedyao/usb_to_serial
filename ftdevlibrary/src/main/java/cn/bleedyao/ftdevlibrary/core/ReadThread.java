@@ -16,8 +16,8 @@ public class ReadThread extends Thread {
     private Handler mHandler;
     private FT_Device ftDev;
     private long lastTime;
-    private static final int READ_DELAY = 20;
-    private static final int CHECKOUT_DELAY = READ_DELAY + 5;
+    private static final int READ_DELAY = 22;
+    private static final int CHECKOUT_DELAY = READ_DELAY + 10;
 
     ReadThread(Handler h, FT_Device ftDev) {
         mHandler = h;
@@ -70,7 +70,7 @@ public class ReadThread extends Thread {
                         mHandler.sendMessageDelayed(msg, CHECKOUT_DELAY);
                     } else {
                         mHandler.removeMessages(ConfigParam.MESSAGE_RESEVIE);
-                        temp = temp.concat(extractData(ConfigParam.readDataToText,
+                        temp = temp.concat("|").concat(extractData(ConfigParam.readDataToText,
                                 iavailable));
 //                        msg.obj = temp;
                         bundle.putString("data", temp);

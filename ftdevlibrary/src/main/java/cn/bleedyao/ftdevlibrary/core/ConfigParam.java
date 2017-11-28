@@ -242,8 +242,8 @@ public class ConfigParam {
 //		ftDev.purge((byte) (D2xxManager.FT_PURGE_TX | D2xxManager.FT_PURGE_RX));
 
 //        String writeData = writeText.getText().toString();
-        byte[] outData = command.getBytes(Charset.forName("ISO-8859-1"));
-        SingleToast.showToastShort(mContext, command.length() + " send: ".concat(command));
+        byte[] outData = command.getBytes(Charset.forName(charsetName));
+        SingleToast.showToastShort(mContext, "command length: "+command.length() + " send: ".concat(command));
 //        Log.d("config", "sendCommand: " + Arrays.toString(outData));
         ftDev.write(outData, command.length());
     }
