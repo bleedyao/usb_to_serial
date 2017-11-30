@@ -4,7 +4,7 @@ package cn.bleedyao.ftdevlibrary.listen;
  * Created by yaoluhao on 25/11/2017.
  */
 
-public class CharConvertModel implements Converter {
+public class HexConvertModel implements Converter {
     @Override
     public String convert(String hex) {
         StringBuilder sb = new StringBuilder();

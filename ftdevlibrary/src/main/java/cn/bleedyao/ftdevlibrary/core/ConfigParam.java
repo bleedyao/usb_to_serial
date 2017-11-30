@@ -243,13 +243,13 @@ public class ConfigParam {
 
 //        String writeData = writeText.getText().toString();
         byte[] outData = command.getBytes(Charset.forName(charsetName));
-        SingleToast.showToastShort(mContext, "command length: " + command.length() + " send: "
-                .concat(command));
 //        Log.d("config", "sendCommand: " + Arrays.toString(outData));
         ftDev.write(outData, command.length());
     }
 
     void sendCommand(String message, Converter converter) {
+        SingleToast.showToastShort(mContext, "command length: " + message.length() + " send: "
+                .concat(message));
         if (converter != null) {
             message = converter.convert(message);
         }

@@ -45,9 +45,8 @@ public class LampConfig implements MessageObserver {
         return this;
     }
 
-    public LampConfig setUpdateListenr(UpdateListener<String, Map<String, Integer>> listenr) {
+    public void setUpdateListenr(UpdateListener<String, Map<String, Integer>> listenr) {
         this.listener = listenr;
-        return this;
     }
 
     public void sendMessage(String msg) {

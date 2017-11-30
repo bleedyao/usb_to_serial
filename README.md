@@ -23,7 +23,7 @@ Step 1. Add it in your root build.gradle at the end of repositories:
 Step 2. Add the dependency
 ```groovy
 	dependencies {
-		compile 'com.github.bleedyao:usb_to_serial:v1.0'
+		compile 'com.github.bleedyao:usb_to_serial:lastest'
 	}
 ```
 
@@ -44,7 +44,7 @@ dev.setBaudRate(115200)
    .setParity((byte) 0)
    .setFlowControl((byte) 0)
    .setStopBit((byte) 1)
-   .setConvertModel(new CharConvertModel())
+   .setConvertModel(new HexConvertModel())
    .setCharsetName("ISO-8859-1");
 ```
 波特率等 6 个参数上文中有默认值，因此这 6 个参数可以不进行修改。
@@ -70,6 +70,8 @@ dev.sendMessage("你要发送的任何数据的字符串形式");
 
     所以我需要把这个转化过程放在 convert 里面，而 restore 则是接收的时候的转换逻辑。注：接收的数据是字符组成的字符串，在 ReadThread 类中第 50 ~ 53 行显示。
 
+    如果你发送的是想 AT 指令这样的字符串（"AT+UID=?"），完全可以不设置转换模式即可。
+
     如果你和我的转换逻辑不同，你可以自定义 Converter，在定义自己的转换模式
 
 * 接收数据
@@ -79,6 +81,10 @@ dev.sendMessage("你要发送的任何数据的字符串形式");
     * filter 是过滤器，在此处选择你要接收的数据样式，返回 true 则接收数据。
     * receive 这里是接收到的数据，和数据的有效长度，用于判断广播命令中，是否存在多条数据存在于一条返回数据中。
     * 调用 dev.addObserver 方法，监听被观察者。
+## 退出
+
+在 onStop 方法中调用 dev.close()，结束程序
+
 ## 实例代码 sample 说明
 sample 中的代码是我在之上的基础上进行的封装，其原理和上述内容相同，
 ​    
