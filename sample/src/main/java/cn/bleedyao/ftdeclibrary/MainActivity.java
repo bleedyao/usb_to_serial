@@ -11,6 +11,7 @@ import java.util.Map;
 
 import cn.bleedyao.ftdevlibrary.core.FtDev;
 import cn.bleedyao.ftdevlibrary.lamp.LampConfig;
+import cn.bleedyao.ftdevlibrary.listen.HexConvertModel;
 import cn.bleedyao.ftdevlibrary.listen.UpdateListener;
 
 public class MainActivity extends AppCompatActivity {
@@ -24,7 +25,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         LampConfig.init(this);
-        LampConfig.getIntance().addObserver();
+        LampConfig.getIntance()
+                .addObserver();
         FtDev.getInstance()
                 .setBaudRate(115200)
                 .setDataBit((byte) 8)
@@ -32,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
                 .setParity((byte) 0)
                 .setFlowControl((byte) 0)
                 .setStopBit((byte) 1)
+                .setConvertModel(new HexConvertModel())
                 .setCharsetName("ISO-8859-1");
         mButton = findViewById(R.id.button);
         mTextView = findViewById(R.id.textView);
@@ -39,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LampConfig.getIntance().sendMessage("AT+UID=?");
+                LampConfig.getIntance().sendMessage("5A0000810178");
 
                 LampConfig.getIntance().setUpdateListenr(new UpdateListener<String, Map<String,
                         Integer>>() {
@@ -60,6 +63,12 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LampConfig.getIntance().sendMessage("2029");
     }
 
     @Override

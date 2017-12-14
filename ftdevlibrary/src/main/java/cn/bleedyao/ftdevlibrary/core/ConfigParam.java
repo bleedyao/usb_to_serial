@@ -238,6 +238,7 @@ public class ConfigParam {
             return;
         }
 
+        command = command.replace(" ","");
         ftDev.setLatencyTimer((byte) 16);
 //		ftDev.purge((byte) (D2xxManager.FT_PURGE_TX | D2xxManager.FT_PURGE_RX));
 

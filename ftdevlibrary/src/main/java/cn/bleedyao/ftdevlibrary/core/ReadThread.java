@@ -16,7 +16,7 @@ public class ReadThread extends Thread {
     private Handler mHandler;
     private FT_Device ftDev;
     private long lastTime;
-    private static final int READ_DELAY = 50;
+    private static final int READ_DELAY = 100;
     private static final int CHECKOUT_DELAY = READ_DELAY + 10;
 
     ReadThread(Handler h, FT_Device ftDev) {
@@ -29,8 +29,8 @@ public class ReadThread extends Thread {
     public void run() {
         int i;
         int iavailable;
-        long currentTime;
-        String temp = "";
+//        long currentTime;
+//        String temp = "";
         Bundle bundle = new Bundle();
         while (ConfigParam.bReadThreadGoing) {
             try {
@@ -52,9 +52,9 @@ public class ReadThread extends Thread {
                         ConfigParam.readDataToText[i] = (char) ConfigParam.readData[i];
                     }
 
-                    currentTime = System.currentTimeMillis();
-                    long differTime = currentTime - lastTime;
-                    lastTime = currentTime;
+//                    currentTime = System.currentTimeMillis();
+//                    long differTime = currentTime - lastTime;
+//                    lastTime = currentTime;
 
 //                        Log.d(TAG, "run: " + differTime);
                     Message msg = mHandler.obtainMessage();
@@ -63,19 +63,19 @@ public class ReadThread extends Thread {
                             iavailable));
                     bundle.putInt(FtDev.AVAILABLE, iavailable);
                     msg.setData(bundle);
-//                    msg.obj = extractData(ConfigParam.readDataToText, iavailable);
+                    msg.obj = extractData(ConfigParam.readDataToText, iavailable);
                     // 解决接收两次数据得到一条完整数据的问题
-                    if (differTime > CHECKOUT_DELAY) {
-                        temp = extractData(ConfigParam.readDataToText, iavailable);
-                        mHandler.sendMessageDelayed(msg, CHECKOUT_DELAY);
-                    } else {
-                        mHandler.removeMessages(ConfigParam.MESSAGE_RESEVIE);
-                        temp = temp.concat("|").concat(extractData(ConfigParam.readDataToText,
-                                iavailable));
-//                        msg.obj = temp;
-                        bundle.putString("data", temp);
+//                    if (differTime > CHECKOUT_DELAY) {
+//                        temp = extractData(ConfigParam.readDataToText, iavailable);
+//                        mHandler.sendMessageDelayed(msg, CHECKOUT_DELAY);
+//                    } else {
+//                        mHandler.removeMessages(ConfigParam.MESSAGE_RESEVIE);
+//                        temp = temp.concat("|").concat(extractData(ConfigParam.readDataToText,
+//                                iavailable));
+////                        msg.obj = temp;
+//                        bundle.putString("data", temp);
                         mHandler.sendMessage(msg);
-                    }
+//                    }
 //                        Log.d(TAG, "run: " + temp);
                 }
             }
